@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug iFix Pro</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e293b; color: #fff; }
+        .error { color: #ef4444; background: #7f1d1d; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { color: #10b981; background: #064e3b; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .info { color: #3b82f6; background: #1e3a8a; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug iFix Pro Enterprise</h1>
+    <div id="logs"></div>
+    
+    <script>
+        const log = (msg, type = 'info') => {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            document.getElementById('logs').appendChild(div);
+            console.log(msg);
+        };
+        
+        // Test 1: Check if browser supports modules
+        log('✓ Testing ES Modules support...', 'info');
+        
+        // Catch all errors
+        window.onerror = (msg, source, lineno, colno, error) => {
+            log(`❌ ERROR: ${msg} at ${source}:${lineno}:${colno}`, 'error');
+            log(`Stack: ${error?.stack || 'No stack'}`, 'error');
+            return true;
+        };
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            log(`❌ PROMISE ERROR: ${event.reason}`, 'error');
+        });
+    </script>
+    
+    <!-- Test React Import -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.3.1",
+        "react-dom-client": "https://esm.sh/react-dom@18.3.1/client"
+      }
+    }
+    </script>
+    
+    <script type="module">
+        // Test imports
+        try {
+            log('✓ Testing React import...', 'info');
+            const React = await import('react');
+            log('✅ React imported successfully: ' + React.version, 'success');
+            
+            log('✓ Testing React DOM import...', 'info');
+            const ReactDOM = await import('react-dom-client');
+            log('✅ React DOM imported successfully', 'success');
+            
+            log('✓ Testing Firebase import...', 'info');
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js');
+            log('✅ Firebase imported successfully', 'success');
+            
+            // Test Firebase init
+            log('✓ Testing Firebase initialization...', 'info');
+            const firebaseConfig = {
+                apiKey: "AIzaSyAF9msg6MbCPuyB2iJ1yXkUrQYTgG_H5EM",
+                authDomain: "ifix-enterprise.firebaseapp.com",
+                projectId: "ifix-enterprise",
+                storageBucket: "ifix-enterprise.firebasestorage.app",
+                messagingSenderId: "954001235629",
+                appId: "1:954001235629:web:0cf28c5eeff9041e3ff024"
+            };
+            
+            const app = initializeApp(firebaseConfig);
+            log('✅ Firebase initialized successfully!', 'success');
+            log('✅ App name: ' + app.name, 'success');
+            
+            // Test Babel
+            log('✓ Checking Babel...', 'info');
+            if (typeof Babel !== 'undefined') {
+                log('✅ Babel loaded successfully', 'success');
+            } else {
+                log('⚠️ Babel not loaded yet', 'info');
+            }
+            
+            log('🎉 ALL TESTS PASSED! Main app should work.', 'success');
+            
+        } catch (err) {
+            log('❌ IMPORT ERROR: ' + err.message, 'error');
+            log('Stack: ' + err.stack, 'error');
+        }
+    </script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" onload="log('✅ Babel loaded', 'success')" onerror="log('❌ Babel failed to load', 'error')"></script>
+</body>
+</html>

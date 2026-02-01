@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Test</title>
+</head>
+<body>
+    <h1>Testing Firebase...</h1>
+    <div id="result"></div>
+    
+    <script type="module">
+        // Test Firebase v11
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAF9msg6MbCPuyB2iJ1yXkUrQYTgG_H5EM",
+            authDomain: "ifix-enterprise.firebaseapp.com",
+            projectId: "ifix-enterprise",
+            storageBucket: "ifix-enterprise.appspot.com",
+            messagingSenderId: "954001235629",
+            appId: "1:954001235629:web:0cf28c5eeff9041e3ff024"
+        };
+        
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            document.getElementById('result').innerHTML = '✅ Firebase initialized successfully!';
+            console.log('✅ Firebase OK', app);
+        } catch (err) {
+            document.getElementById('result').innerHTML = '❌ Error: ' + err.message;
+            console.error('❌ Firebase Error:', err);
+        }
+    </script>
+</body>
+</html>

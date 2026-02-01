@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pure ESM Test (No Babel)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white p-8">
+    <h1 class="text-2xl font-bold mb-4">Pure ESM Test (No Babel/JSX)</h1>
+    <div id="root"></div>
+    <div id="status" class="mt-4 space-y-2"></div>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.3.1",
+        "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "firebase/app": "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"
+      }
+    }
+    </script>
+
+    <script type="module">
+        const log = (msg, type = 'info') => {
+            const div = document.createElement('div');
+            div.className = `p-3 rounded ${type === 'error' ? 'bg-red-900' : type === 'success' ? 'bg-green-900' : 'bg-blue-900'}`;
+            div.textContent = msg;
+            document.getElementById('status').appendChild(div);
+            console.log(msg);
+        };
+
+        try {
+            log('Loading React...');
+            const React = await import('react');
+            log('✅ React ' + React.version, 'success');
+            
+            log('Loading React DOM...');
+            const { createRoot } = await import('react-dom/client');
+            log('✅ React DOM loaded', 'success');
+            
+            log('Loading Firebase...');
+            const { initializeApp } = await import('firebase/app');
+            const { getAuth, onAuthStateChanged } = await import('firebase/auth');
+            const { getFirestore } = await import('firebase/firestore');
+            log('✅ Firebase loaded', 'success');
+            
+            log('Initializing Firebase...');
+            const app = initializeApp({
+                apiKey: "AIzaSyAF9msg6MbCPuyB2iJ1yXkUrQYTgG_H5EM",
+                authDomain: "ifix-enterprise.firebaseapp.com",
+                projectId: "ifix-enterprise",
+                storageBucket: "ifix-enterprise.firebasestorage.app",
+                messagingSenderId: "954001235629",
+                appId: "1:954001235629:web:0cf28c5eeff9041e3ff024"
+            });
+            log('✅ Firebase initialized!', 'success');
+            
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            log('✅ Auth & Firestore ready', 'success');
+            
+            // Create React app WITHOUT JSX
+            log('Rendering React app...');
+            const { useState } = React;
+            
+            const App = () => {
+                const [count, setCount] = useState(0);
+                const [user, setUser] = useState(null);
+                
+                React.useEffect(() => {
+                    onAuthStateChanged(auth, (u) => {
+                        setUser(u);
+                        log(u ? '✅ User logged in: ' + u.email : 'ℹ️ No user logged in', 'info');
+                    });
+                }, []);
+                
+                return React.createElement('div', {
+                    className: 'bg-white text-slate-900 p-8 rounded-lg space-y-4'
+                }, [
+                    React.createElement('h2', { key: 'title', className: 'text-2xl font-bold' }, 
+                        '✅ React + Firebase Working!'
+                    ),
+                    React.createElement('div', { key: 'info', className: 'space-y-2' }, [
+                        React.createElement('p', { key: 'count' }, 'Counter: ' + count),
+                        React.createElement('p', { key: 'user' }, 
+                            'Auth Status: ' + (user ? user.email : 'Not logged in')
+                        ),
+                        React.createElement('p', { key: 'db' }, 'Firestore: Connected ✅')
+                    ]),
+                    React.createElement('button', {
+                        key: 'btn',
+                        onClick: () => setCount(count + 1),
+                        className: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'
+                    }, 'Increment: ' + count)
+                ]);
+            };
+            
+            const root = createRoot(document.getElementById('root'));
+            root.render(React.createElement(App));
+            log('✅ React app rendered!', 'success');
+            log('🎉 EVERYTHING WORKS!', 'success');
+            
+        } catch (err) {
+            log('❌ ERROR: ' + err.message, 'error');
+            console.error(err);
+        }
+    </script>
+</body>
+</html>
